@@ -1,0 +1,9 @@
+# Install PyTorch (CPU build) first:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch
+gymnasium[mujoco,box2d,classic-control]
+gymnasium-robotics
+tensorboard
+imageio[ffmpeg]
+moviepy
+tqdm
