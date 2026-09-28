@@ -69,11 +69,11 @@ class Agent(nn.Module):
 
     def act(self, obs, deterministic=True):
         """Greedy action for a single observation (numpy array) -> Python int."""
-        # TODO (step 0): convert obs to a float tensor with a batch dim, return argmax of q_values
         data = torch.as_tensor(obs, dtype=torch.float32)
         data = data.unsqueeze(0)
-        q = self.q_values(data)      
-        return q.argmax(dim=1)[0].item() 
+        with torch.no_grad():  # choosing an action needs no gradients
+            q = self.q_values(data)
+        return q.argmax(dim=1)[0].item()
 
 
 
@@ -85,8 +85,12 @@ class Agent(nn.Module):
 def select_action(agent, obs, epsilon, action_space):
     """Epsilon-greedy: random action with prob. epsilon, else agent.act(obs).
     (With --noisy the loop passes epsilon=0: the noise in the weights does the exploring.)"""
-    # TODO (step 0)
-    raise NotImplementedError("select_action")
+    rand = np.random.rand()
+    if epsilon > rand:
+        action = int(action_space.sample())
+    else:
+        action = agent.act(obs)
+    return action
 
 
 def store_transition(buffer, nstep, obs, action, reward, next_obs, terminated, truncated):
