@@ -70,7 +70,11 @@ class Agent(nn.Module):
     def act(self, obs, deterministic=True):
         """Greedy action for a single observation (numpy array) -> Python int."""
         # TODO (step 0): convert obs to a float tensor with a batch dim, return argmax of q_values
-        raise NotImplementedError("Agent.act")
+        data = torch.as_tensor(obs, dtype=torch.float32)
+        data = data.unsqueeze(0)
+        q = self.q_values(data)      
+        return q.argmax(dim=1)[0].item() 
+
 
 
 # -------------------------------------------------------------------------------------------------
