@@ -7,3 +7,6 @@ tensorboard
 imageio[ffmpeg]
 moviepy
 tqdm
+matplotlib
+pandas
+pytest

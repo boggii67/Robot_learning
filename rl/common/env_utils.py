@@ -14,11 +14,15 @@ Every Gymnasium env follows the same loop:
   This distinction matters when you compute bootstrapped targets (DQN, SAC, PPO)!
 """
 
+import contextlib
+import io
+
 import gymnasium as gym
 
 try:
     # Registers the robot-arm envs (FetchReach, FetchPush, ...). Optional.
-    import gymnasium_robotics
+    with contextlib.redirect_stderr(io.StringIO()):  # hides an irrelevant notice about the Adroit hand envs
+        import gymnasium_robotics
 
     gym.register_envs(gymnasium_robotics)
 except ImportError:

@@ -3,11 +3,13 @@
 Examples:
     python scripts/play.py --env-id HalfCheetah-v5                         # random actions
     python scripts/play.py --env-id CartPole-v1 --algo dqn --model runs/<run>/model.pt
+    python scripts/play.py --env-id LunarLander-v3 --algo dqn --model runs/<experiment>/<variant>/s0/model.pt
     python scripts/play.py --env-id Hopper-v5 --video-dir videos/hopper    # save mp4 instead of window
 """
 
 import argparse
 import importlib
+import inspect
 import os
 import sys
 
@@ -17,7 +19,7 @@ import torch
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from rl.common.env_utils import describe_env, make_env  # noqa: E402
-from rl.common.utils import load_agent  # noqa: E402
+from rl.common.utils import load_agent, load_config  # noqa: E402
 
 
 def main():
@@ -33,7 +35,12 @@ def main():
     describe_env(env)
 
     Agent = importlib.import_module(f"rl.algos.{args.algo}").Agent
-    agent = Agent(env.observation_space, env.action_space)
+    # config.json next to model.pt says how the network was built (e.g. --dueling --c51)
+    config = load_config(os.path.dirname(args.model)) if args.model else None
+    if config is not None and "config" in inspect.signature(Agent).parameters:
+        agent = Agent(env.observation_space, env.action_space, config=config)
+    else:
+        agent = Agent(env.observation_space, env.action_space)
     if args.model:
         load_agent(agent, args.model)
     agent.eval()
